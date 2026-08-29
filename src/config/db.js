@@ -7,10 +7,7 @@ const pool = new Pool({
   database: env.db.name,
   user: env.db.user,
   password: env.db.password,
-  ssl: {
-    require: true,
-    rejectUnauthorized: env.db.sslRejectUnauthorized,
-  },
+  ssl: env.db.ssl ? { require: true, rejectUnauthorized: env.db.sslRejectUnauthorized } : false,
 });
 
 pool.on("connect", () => {

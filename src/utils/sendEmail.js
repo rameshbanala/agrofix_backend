@@ -9,6 +9,12 @@ const transporter = nodemailer.createTransport({
     user: env.email.user,
     pass: env.email.password,
   },
+  // Fail fast instead of hanging the request that triggered the email —
+  // nodemailer's defaults can otherwise block for minutes if the SMTP
+  // server is unreachable or misconfigured.
+  connectionTimeout: 10_000,
+  greetingTimeout: 10_000,
+  socketTimeout: 10_000,
 });
 
 async function sendEmail({ email, subject, html, attachments }) {

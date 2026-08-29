@@ -35,9 +35,30 @@ npm install
 cp .env.example .env   # fill in DB/JWT/email values
 npm run dev             # nodemon, auto-restarts
 npm start                # plain node, for production
+npm test                 # jest
+npm run lint             # eslint
 ```
 
-See `.env.example` for all required/optional environment variables.
+See `.env.example` for all required/optional environment variables. Before running against
+a fresh database, apply the SQL files in `migrations/` (see `migrations/README.md`).
+
+## Features
+
+- Product catalogue: search, category filter, pagination, sort (`GET /products`).
+- Bulk-quantity pricing tiers per product — orders automatically apply the best-matching
+  tier price for the quantity purchased.
+- Admin product image upload via Cloudinary (`POST /products/upload`), with a graceful
+  fallback (clear error, manual image URL still works) if Cloudinary isn't configured.
+- Admin CSV product import (`POST /products/import`) — validates each row independently
+  and reports per-row errors without aborting the whole import.
+- Buyer saved delivery addresses (`/addresses`).
+- Order status history/timeline, exposed on every order response as `status_history`.
+- Best-effort email notification to the buyer on every order status change (including
+  cancellation) — fire-and-forget, never blocks the request, and fails silently (logged)
+  if email isn't configured or times out.
+- Admin analytics summary (`GET /analytics/summary`): revenue, orders by status, top
+  products, a 14-day revenue trend, and low-stock products.
+- Admin user management (`GET /users`, `PUT /users/:id/role`).
 
 ## Notable security/architecture fixes in this pass
 

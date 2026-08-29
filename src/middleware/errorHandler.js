@@ -17,6 +17,14 @@ function errorHandler(err, req, res, next) {
     return res.status(403).json({ error: "Origin not allowed" });
   }
 
+  if (err.name === "MulterError") {
+    const message = err.code === "LIMIT_FILE_SIZE" ? "File is too large" : err.message;
+    return res.status(400).json({ error: message });
+  }
+  if (err.message && /only .*(images|csv).* are allowed/i.test(err.message)) {
+    return res.status(400).json({ error: err.message });
+  }
+
   // Postgres error codes: https://www.postgresql.org/docs/current/errcodes-appendix.html
   if (err.code === "23505") {
     return res.status(409).json({ error: "Resource already exists" });

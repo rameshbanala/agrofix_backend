@@ -6,6 +6,9 @@ const env = require("./config/env");
 const authRoutes = require("./routes/auth");
 const productRoutes = require("./routes/products");
 const orderRoutes = require("./routes/orders");
+const addressRoutes = require("./routes/addresses");
+const userRoutes = require("./routes/users");
+const analyticsRoutes = require("./routes/analytics");
 const { notFoundHandler, errorHandler } = require("./middleware/errorHandler");
 
 const app = express();
@@ -30,6 +33,9 @@ app.get("/health", (req, res) => res.json({ status: "ok" }));
 app.use("/auth", authRoutes);
 app.use("/products", productRoutes);
 app.use("/orders", orderRoutes);
+app.use("/addresses", addressRoutes);
+app.use("/users", userRoutes);
+app.use("/analytics", analyticsRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
