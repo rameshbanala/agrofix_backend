@@ -1,41 +1,26 @@
 const nodemailer = require("nodemailer");
-require("dotenv").config();
+const env = require("../config/env");
 
-// Create a transporter object
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com", // or your preferred SMTP host
+  host: "smtp.gmail.com",
   port: 587,
-  secure: false, // true for 465, false for other ports
+  secure: false,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD, // use app password for Gmail
+    user: env.email.user,
+    pass: env.email.password,
   },
 });
 
-// Email sending function
-const sendEmail = async (options) => {
-  try {
-    // Configure mail options
-    const mailOptions = {
-      from: `"Your App" <${process.env.EMAIL_USER}>`,
-      to: options.email,
-      subject: options.subject,
-      html: options.html,
-    };
+async function sendEmail({ email, subject, html, attachments }) {
+  const mailOptions = {
+    from: `"${env.email.fromName}" <${env.email.user}>`,
+    to: email,
+    subject,
+    html,
+  };
+  if (attachments) mailOptions.attachments = attachments;
 
-    // Add attachments if any
-    if (options.attachments) {
-      mailOptions.attachments = options.attachments;
-    }
-
-    // Send the email
-    const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent: ", info.response);
-    return info;
-  } catch (error) {
-    console.error("Error sending email: ", error);
-    throw error;
-  }
-};
+  return transporter.sendMail(mailOptions);
+}
 
 module.exports = { sendEmail };

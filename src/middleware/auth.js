@@ -1,21 +1,25 @@
-// middlewares/auth.js
 const jwt = require("jsonwebtoken");
+const env = require("../config/env");
 
 function authenticate(req, res, next) {
-  const token = req.headers.authorization?.split(" ")[1];
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
   if (!token) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    const user = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = user;
+    req.user = jwt.verify(token, env.jwt.secret);
     next();
-  } catch {
-    return res.status(403).json({ error: "Invalid token" });
+  } catch (err) {
+    const message =
+      err.name === "TokenExpiredError"
+        ? "Session expired, please log in again"
+        : "Invalid token";
+    return res.status(401).json({ error: message });
   }
 }
 
 function authorizeAdmin(req, res, next) {
-  if (req.user.role !== "admin") {
+  if (req.user?.role !== "admin") {
     return res.status(403).json({ error: "Admin access only" });
   }
   next();
