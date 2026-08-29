@@ -3,14 +3,33 @@ const router = express.Router();
 
 const { authenticate, authorizeAdmin } = require("../middleware/auth");
 const validate = require("../middleware/validate");
+const { imageUpload, csvUpload } = require("../middleware/upload");
 const controller = require("../controllers/productController");
 const {
   createProductSchema,
   updateProductSchema,
   productIdParamSchema,
+  listProductsQuerySchema,
 } = require("../validators/productValidators");
 
-router.get("/", controller.list);
+router.get("/", validate(listProductsQuerySchema, "query"), controller.list);
+router.get("/categories", controller.listCategories);
+
+router.post(
+  "/upload",
+  authenticate,
+  authorizeAdmin,
+  imageUpload.single("image"),
+  controller.uploadImage
+);
+
+router.post(
+  "/import",
+  authenticate,
+  authorizeAdmin,
+  csvUpload.single("file"),
+  controller.importCsv
+);
 
 router.get(
   "/:id",
